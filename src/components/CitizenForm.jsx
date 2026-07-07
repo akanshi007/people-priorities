@@ -42,10 +42,11 @@ function CitizenForm() {
   }
 
   async function handleSubmit(e) {
+
     e.preventDefault();
 
     if (!location) {
-      alert("Please select a complaint location.");
+      toast.error("Please select a location on the map.");
       return;
     }
 
@@ -73,7 +74,7 @@ function CitizenForm() {
 
       saveComplaint(complaintData);
 
-      alert("Complaint submitted successfully!");
+      toast.success("Complaint submitted successfully!");
 
       setFormData({
         name: "",
@@ -88,8 +89,11 @@ function CitizenForm() {
       setLocation(null);
       setAddress("");
     } catch (err) {
+
       console.error(err);
-      alert("AI analysis failed.");
+
+      toast.error("Failed to analyze complaint.");
+
     } finally {
       setLoading(false);
     }
@@ -224,7 +228,7 @@ function CitizenForm() {
         </select>
 
       </div>
-            {/* Language */}
+      {/* Language */}
 
       <div>
 
@@ -464,7 +468,7 @@ function CitizenForm() {
         {loading ? "Analyzing Complaint..." : "Analyze with AI"}
 
       </button>
-            {/* AI Result */}
+      {/* AI Result */}
 
       {result && (
 
@@ -541,10 +545,9 @@ function CitizenForm() {
                   py-2
                   rounded-full
                   font-semibold
-                  ${
-                    result.urgency === "High"
-                      ? "bg-red-100 text-red-700"
-                      : result.urgency === "Medium"
+                  ${result.urgency === "High"
+                    ? "bg-red-100 text-red-700"
+                    : result.urgency === "Medium"
                       ? "bg-yellow-100 text-yellow-700"
                       : "bg-green-100 text-green-700"
                   }

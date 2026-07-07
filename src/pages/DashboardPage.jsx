@@ -1,180 +1,79 @@
 import { useEffect, useState } from "react";
+
 import { getComplaints } from "../services/storage";
-import Charts from "../components/Charts";
-import AIInsights from "../components/AIInsights";
+
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+import StatisticsCards from "../components/dashboard/StatisticsCards";
+import ComplaintMapCard from "../components/dashboard/ComplaintMapCard";
+import ChartsSection from "../components/dashboard/ChartsSection";
+import AIInsightsSection from "../components/dashboard/AIInsightsSection";
+import RecentComplaintsTable from "../components/dashboard/RecentComplaintsTable";
 
 function DashboardPage() {
-
     const [complaints, setComplaints] = useState([]);
+
+    // Filters
+    const [search, setSearch] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("");
+    const [wardFilter, setWardFilter] = useState("");
+    const [priorityFilter, setPriorityFilter] = useState("");
 
     useEffect(() => {
         setComplaints(getComplaints());
     }, []);
 
-    return (
+    const filteredComplaints = complaints.filter((item) => {
+        const matchesSearch = (item.complaint || "")
+            .toLowerCase()
+            .includes(search.toLowerCase());
 
+        const matchesCategory =
+            categoryFilter === "" ||
+            item.category === categoryFilter;
+
+        const matchesWard =
+            wardFilter === "" ||
+            item.ward === wardFilter;
+
+        const matchesPriority =
+            priorityFilter === "" ||
+            Number(item.priority) >= Number(priorityFilter);
+
+        return (
+            matchesSearch &&
+            matchesCategory &&
+            matchesWard &&
+            matchesPriority
+        );
+    });
+
+    return (
         <div className="max-w-7xl mx-auto py-10 px-6">
 
-            <h1 className="text-4xl font-bold mb-8">
-                MP Dashboard
-            </h1>
+            <DashboardHeader />
 
-            {/* Statistics Cards */}
+            <StatisticsCards complaints={filteredComplaints} />
 
-            <div className="grid md:grid-cols-4 gap-6 mb-10">
+            <ComplaintMapCard complaints={filteredComplaints} />
 
-                <div className="bg-blue-600 text-white rounded-xl p-6">
+            <ChartsSection
+                complaints={filteredComplaints}
+                search={search}
+                setSearch={setSearch}
+                categoryFilter={categoryFilter}
+                setCategoryFilter={setCategoryFilter}
+                wardFilter={wardFilter}
+                setWardFilter={setWardFilter}
+                priorityFilter={priorityFilter}
+                setPriorityFilter={setPriorityFilter}
+            />
 
-                    <h2 className="text-lg">Total Complaints</h2>
+            <AIInsightsSection complaints={filteredComplaints} />
 
-                    <p className="text-4xl font-bold mt-3">
-                        {complaints.length}
-                    </p>
-
-                </div>
-
-                <div className="bg-red-600 text-white rounded-xl p-6">
-
-                    <h2 className="text-lg">High Priority</h2>
-
-                    <p className="text-4xl font-bold mt-3">
-                        {complaints.filter(c => c.priority >= 4).length}
-                    </p>
-
-                </div>
-
-                <div className="bg-green-600 text-white rounded-xl p-6">
-
-                    <h2 className="text-lg">Departments</h2>
-
-                    <p className="text-4xl font-bold mt-3">
-                        {new Set(complaints.map(c => c.department)).size}
-                    </p>
-
-                </div>
-
-                <div className="bg-yellow-500 text-white rounded-xl p-6">
-
-                    <h2 className="text-lg">Today's Reports</h2>
-
-                    <p className="text-4xl font-bold mt-3">
-                        {complaints.length}
-                    </p>
-
-                </div>
-
-            </div>
-
-            {/* Charts */}
-
-            <Charts complaints={complaints} />
-
-            {/* AI Insights */}
-
-            <AIInsights complaints={complaints} />
-
-            {/* Recent Complaints */}
-
-            <div className="bg-white rounded-2xl shadow-lg p-6 mt-10">
-
-                <h2 className="text-2xl font-bold mb-5">
-                    Recent Complaints
-                </h2>
-
-                <div className="overflow-x-auto">
-
-                    <table className="w-full">
-
-                        <thead>
-
-                            <tr className="border-b bg-gray-100">
-
-                                <th className="text-left py-3 px-2">
-                                    Category
-                                </th>
-
-                                <th className="text-left px-2">
-                                    Ward
-                                </th>
-
-                                <th className="text-left px-2">
-                                    Priority
-                                </th>
-
-                                <th className="text-left px-2">
-                                    Department
-                                </th>
-
-                                <th className="text-left px-2">
-                                    Date
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {complaints.length === 0 ? (
-
-                                <tr>
-
-                                    <td
-                                        colSpan="5"
-                                        className="text-center py-8 text-gray-500"
-                                    >
-                                        No complaints submitted yet.
-                                    </td>
-
-                                </tr>
-
-                            ) : (
-
-                                complaints.map((item, index) => (
-
-                                    <tr
-                                        key={index}
-                                        className="border-b hover:bg-gray-50"
-                                    >
-
-                                        <td className="py-3 px-2">
-                                            {item.category}
-                                        </td>
-
-                                        <td className="px-2">
-                                            {item.ward}
-                                        </td>
-
-                                        <td className="px-2">
-                                            ⭐ {item.priority}
-                                        </td>
-
-                                        <td className="px-2">
-                                            {item.department}
-                                        </td>
-
-                                        <td className="px-2">
-                                            {item.date}
-                                        </td>
-
-                                    </tr>
-
-                                ))
-
-                            )}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
+            <RecentComplaintsTable complaints={filteredComplaints} />
 
         </div>
-
     );
-
 }
 
 export default DashboardPage;

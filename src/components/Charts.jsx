@@ -13,11 +13,12 @@ import {
 } from "recharts";
 
 const COLORS = [
-    "#2563eb",
-    "#16a34a",
-    "#dc2626",
-    "#f59e0b",
-    "#7c3aed",
+    "#2563EB",
+    "#14B8A6",
+    "#F59E0B",
+    "#EF4444",
+    "#8B5CF6",
+    "#06B6D4",
 ];
 
 function Charts({ complaints }) {
@@ -39,6 +40,30 @@ function Charts({ complaints }) {
         count,
     }));
 
+    if (complaints.length === 0) {
+
+        return (
+
+            <div className="grid md:grid-cols-2 gap-8">
+
+                <div className="bg-slate-50 rounded-3xl h-80 flex items-center justify-center text-slate-400">
+
+                    No Chart Data
+
+                </div>
+
+                <div className="bg-slate-50 rounded-3xl h-80 flex items-center justify-center text-slate-400">
+
+                    No Chart Data
+
+                </div>
+
+            </div>
+
+        );
+
+    }
+
     return (
         <div className="grid md:grid-cols-2 gap-8 mt-10">
 
@@ -56,7 +81,10 @@ function Charts({ complaints }) {
                             data={categoryData}
                             dataKey="value"
                             nameKey="name"
-                            outerRadius={100}
+                            innerRadius={60}
+                            outerRadius={105}
+                            paddingAngle={3}
+                            cornerRadius={8}
                         >
                             {categoryData.map((entry, index) => (
                                 <Cell
@@ -66,9 +94,18 @@ function Charts({ complaints }) {
                             ))}
                         </Pie>
 
-                        <Tooltip />
+                        <Tooltip
+                            contentStyle={{
+                                borderRadius: "12px",
+                                border: "none",
+                                boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+                            }}
+                        />
 
-                        <Legend />
+                        <Legend
+                            verticalAlign="bottom"
+                            height={36}
+                        />
 
                     </PieChart>
 
@@ -76,7 +113,7 @@ function Charts({ complaints }) {
 
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl shadow-xl border border-slate-200 p-8">
 
                 <h2 className="text-xl font-bold mb-4">
                     Ward-wise Complaints
@@ -86,11 +123,19 @@ function Charts({ complaints }) {
 
                     <BarChart data={wardData}>
 
-                        <CartesianGrid strokeDasharray="3 3" />
+                        <CartesianGrid
+                            strokeDasharray="5 5"
+                            stroke="#E5E7EB"
+                        />
 
-                        <XAxis dataKey="ward" />
+                        <XAxis
+                            dataKey="ward"
+                            tick={{ fill: "#475569" }}
+                        />
 
-                        <YAxis />
+                        <YAxis
+                            tick={{ fill: "#475569" }}
+                        />
 
                         <Tooltip />
 
@@ -98,8 +143,9 @@ function Charts({ complaints }) {
 
                         <Bar
                             dataKey="count"
-                            fill="#2563eb"
-                            radius={[8, 8, 0, 0]}
+                            fill="#2563EB"
+                            radius={[12, 12, 0, 0]}
+                            animationDuration={1200}
                         />
 
                     </BarChart>
