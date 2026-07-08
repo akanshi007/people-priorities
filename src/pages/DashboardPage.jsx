@@ -1,51 +1,39 @@
 import { useEffect, useState } from "react";
 
 import { getComplaints } from "../services/storage";
+import useComplaintFilters from "../hooks/useComplaintFilters";
 
-import DashboardHeader from "../components/dashboard/DashboardHeader";
-import StatisticsCards from "../components/dashboard/StatisticsCards";
-import ComplaintMapCard from "../components/dashboard/ComplaintMapCard";
-import ChartsSection from "../components/dashboard/ChartsSection";
-import AIInsightsSection from "../components/dashboard/AIInsightsSection";
-import RecentComplaintsTable from "../components/dashboard/RecentComplaintsTable";
+import {
+    DashboardHeader,
+    StatisticsCards,
+    ComplaintMapCard,
+    ChartsSection,
+    AIInsightsSection,
+    RecentComplaintsTable,
+} from "../components/dashboard";
 
 function DashboardPage() {
     const [complaints, setComplaints] = useState([]);
-
-    // Filters
-    const [search, setSearch] = useState("");
-    const [categoryFilter, setCategoryFilter] = useState("");
-    const [wardFilter, setWardFilter] = useState("");
-    const [priorityFilter, setPriorityFilter] = useState("");
 
     useEffect(() => {
         setComplaints(getComplaints());
     }, []);
 
-    const filteredComplaints = complaints.filter((item) => {
-        const matchesSearch = (item.complaint || "")
-            .toLowerCase()
-            .includes(search.toLowerCase());
+    const {
+        filteredComplaints,
 
-        const matchesCategory =
-            categoryFilter === "" ||
-            item.category === categoryFilter;
+        search,
+        setSearch,
 
-        const matchesWard =
-            wardFilter === "" ||
-            item.ward === wardFilter;
+        categoryFilter,
+        setCategoryFilter,
 
-        const matchesPriority =
-            priorityFilter === "" ||
-            Number(item.priority) >= Number(priorityFilter);
+        wardFilter,
+        setWardFilter,
 
-        return (
-            matchesSearch &&
-            matchesCategory &&
-            matchesWard &&
-            matchesPriority
-        );
-    });
+        priorityFilter,
+        setPriorityFilter,
+    } = useComplaintFilters(complaints);
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-6">
@@ -70,7 +58,10 @@ function DashboardPage() {
 
             <AIInsightsSection complaints={filteredComplaints} />
 
-            <RecentComplaintsTable complaints={filteredComplaints} />
+            <RecentComplaintsTable
+                complaints={complaints}
+                setComplaints={setComplaints}
+            />
 
         </div>
     );

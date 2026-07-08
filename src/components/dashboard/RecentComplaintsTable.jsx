@@ -1,4 +1,29 @@
-function RecentComplaintsTable({ complaints }) {
+import { updateComplaintStatus } from "../../services/storage";
+function RecentComplaintsTable({
+    complaints,
+    setComplaints,
+}) {
+
+    const changeStatus = (index, status) => {
+
+        updateComplaintStatus(index, status);
+
+        const updatedComplaints = complaints.map((complaint, i) => {
+
+            if (i === index) {
+                return {
+                    ...complaint,
+                    status,
+                };
+            }
+
+            return complaint;
+
+        });
+
+        setComplaints(updatedComplaints);
+
+    };
     return (
         <div
             className="
@@ -28,19 +53,17 @@ function RecentComplaintsTable({ complaints }) {
 
                     <table className="w-full text-left">
 
-                        <thead className="bg-slate-100 text-slate-700">
+                        <thead className="bg-slate-100 text-slate-700 uppercase text-sm tracking-wider">
 
                             <tr>
 
                                 <th className="py-4 px-4">Category</th>
-
                                 <th className="px-4">Ward</th>
-
                                 <th className="px-4">Priority</th>
-
+                                <th className="px-4">Status</th>
                                 <th className="px-4">Department</th>
-
                                 <th className="px-4">Date</th>
+                                <th className="px-4">Action</th>
 
                             </tr>
 
@@ -53,7 +76,7 @@ function RecentComplaintsTable({ complaints }) {
                                 <tr>
 
                                     <td
-                                        colSpan="5"
+                                        colSpan="7"
                                         className="py-16 text-center"
                                     >
 
@@ -127,10 +150,9 @@ function RecentComplaintsTable({ complaints }) {
                                                     rounded-full
                                                     font-semibold
                                                     text-sm
-                                                    ${
-                                                        item.priority >= 4
-                                                            ? "bg-red-100 text-red-700"
-                                                            : item.priority >= 3
+                                                    ${item.priority >= 4
+                                                        ? "bg-red-100 text-red-700"
+                                                        : item.priority >= 3
                                                             ? "bg-yellow-100 text-yellow-700"
                                                             : "bg-green-100 text-green-700"
                                                     }
@@ -140,9 +162,28 @@ function RecentComplaintsTable({ complaints }) {
                                                 {item.priority >= 4
                                                     ? "🔴 High"
                                                     : item.priority >= 3
-                                                    ? "🟡 Medium"
-                                                    : "🟢 Low"}
+                                                        ? "🟡 Medium"
+                                                        : "🟢 Low"}
 
+                                            </span>
+
+                                        </td>
+
+                                        <td className="px-4">
+
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-sm font-semibold
+            ${item.status === "Resolved"
+                                                        ? "bg-green-100 text-green-700"
+                                                        : item.status === "In Progress"
+                                                            ? "bg-blue-100 text-blue-700"
+                                                            : item.status === "Under Review"
+                                                                ? "bg-yellow-100 text-yellow-700"
+                                                                : "bg-red-100 text-red-700"
+                                                    }
+        `}
+                                            >
+                                                {item.status}
                                             </span>
 
                                         </td>
@@ -164,6 +205,23 @@ function RecentComplaintsTable({ complaints }) {
                                             <div className="text-xs text-slate-400">
                                                 Submitted
                                             </div>
+
+                                        </td>
+
+                                        <td className="px-4">
+
+                                            <select
+                                                value={item.status}
+                                                onChange={(e) =>
+                                                    changeStatus(index, e.target.value)
+                                                }
+                                                className="border rounded-lg p-2"
+                                            >
+                                                <option>Pending</option>
+                                                <option>Under Review</option>
+                                                <option>In Progress</option>
+                                                <option>Resolved</option>
+                                            </select>
 
                                         </td>
 
